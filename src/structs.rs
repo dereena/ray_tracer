@@ -1,5 +1,7 @@
-use glam::DVec3;
+use crate::consts::INFINITY;
 
+
+use glam::DVec3;
 
 pub struct Camera {
     pub position:DVec3,
@@ -8,12 +10,19 @@ pub struct Camera {
     pub viewport_height:f64,
 }
 
-#[derive(Default)]
 pub struct Interval {
     pub min:f64,
     pub max:f64,
 }
 
+impl Default for Interval {
+    fn default() -> Self {
+        Interval {
+            min:0.0001,
+            max:INFINITY,
+        }
+    }
+}
 
 impl Interval {
     pub fn size(&self) -> f64 {
@@ -30,6 +39,11 @@ impl Interval {
             return true
         }
         false
+    }
+    pub fn clamp(&self,t:f64) -> f64 {
+        if t < self.min {return self.min};
+        if t > self.max {return self.max};
+        t
     }
     pub fn set_min(&mut self,t:f64) {
         self.min = t;
@@ -56,17 +70,41 @@ pub struct HitInfo {
     pub position:DVec3,
     pub normal:DVec3,
     pub t:f64,
+    pub did_hit:bool,
     pub inside_sphere:bool,
+    pub material: Material,
 }
 
 impl HitInfo{
     pub fn set_normal(&mut self,ray:&Ray,normal:DVec3) {
         if ray.Dir.dot(normal) < 0.0 { // if the dot is negative, the vectors are facing opposite directions and the ray is outside the sphere
-            self.normal = -normal;
+            self.normal = normal;
             self.inside_sphere = false
         } else { // if the dot is greater than 0, then the vectors align and the ray is inside the sphere
-            self.normal = normal;
+            self.normal = -normal;
             self.inside_sphere = true;
+        }
+    }
+}
+
+#[derive(Copy,Clone)]
+pub struct Material {
+    pub reflection_color:DVec3,
+    pub emmision_color:DVec3,
+    pub emmision_strength:f64,
+    pub fuzz:f64,
+    pub _material:usize,
+}
+
+impl Default for Material {
+    fn default() -> Self {
+        Material {
+            _material:1,
+            reflection_color:DVec3::ZERO,
+            emmision_color:DVec3::ZERO,
+            emmision_strength:0.0,
+            fuzz:0.0,
+            
         }
     }
 }
@@ -74,7 +112,7 @@ impl HitInfo{
 pub struct Sphere{
     pub center: DVec3,
     pub radius:f64,
-    pub _material:usize,
+    pub material:Material,
 }
 
 impl Sphere {
@@ -98,23 +136,24 @@ impl Sphere {
         if determinant < 0.0 {
             return false
         }
-        let dsqrt:f64 = determinant.sqrt(); // save computation time by computing once fro both roots
-        let t1:f64 = (h + dsqrt)/a;
-        let t2:f64 = (h - dsqrt)/a;
+        let dsqrt:f64 = determinant.sqrt(); // save computation time by computing once for both roots
+        let t_near:f64 = (h - dsqrt)/a;
+        let t_far:f64  = (h + dsqrt)/a;
         let root:f64;
-        if t1 <= tmin || t1 >= tmax {
-            if t2 <= tmin || t2 >= tmax {
-                return false
-            } else {
-                root = t2;
-            }
+        if t_near > tmin && t_near < tmax {
+            root = t_near;
+        } else if t_far > tmin && t_far < tmax {
+            root = t_far;
         } else {
-            root = t1;
+            return false;
         }
         let pos:DVec3 = ray.pos(root);
         hit_info.t = root;
         hit_info.position = pos;
+        hit_info.material = self.material;
         hit_info.set_normal(ray,(pos-center)/radius);
+        t_interval.set_max(hit_info.t);
+        hit_info.did_hit = true;
         true
 
         // we want the smaller t value because we want the closer intersection point

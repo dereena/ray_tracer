@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 glam = "0.33.10"
 image = "0.25.10"
+rand = "0.10.3"

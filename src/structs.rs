@@ -93,17 +93,19 @@ pub struct Material {
     pub emmision_color:DVec3,
     pub emmision_strength:f64,
     pub fuzz:f64,
+    pub refractive_index:f64,
     pub _material:usize,
 }
 
 impl Default for Material {
     fn default() -> Self {
         Material {
-            _material:1,
             reflection_color:DVec3::ZERO,
             emmision_color:DVec3::ZERO,
             emmision_strength:0.0,
             fuzz:0.0,
+            refractive_index:1.5,
+            _material:1,
             
         }
     }

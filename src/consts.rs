@@ -5,14 +5,14 @@ use glam::DVec3;
 pub const INFINITY:f64 = f64::MAX;
 pub const PI:f64 = std::f64::consts::PI;
 
-pub const SAMPLES_PER_PIXEL:u32 = 300;
+pub const SAMPLES_PER_PIXEL:u32 = 100;
 pub const MAX_RECURSION_DEPTH:u32 = 25; // bounces
 
 pub const ROTATION_AXES:DVec3 = DVec3::new(1.0,1.0,0.0);
 pub const ROTATION_ANGLES:DVec3 = DVec3::new(0.0,0.0,0.0);
 
 pub const IDEAL_ASPECT_RATIO:f64 = 16.0/10.0;
-pub const WINDOW_WIDTH:u32 = 2000;
+pub const WINDOW_WIDTH:u32 = 1000;
 pub const WINDOW_HEIGHT:u32 = (WINDOW_WIDTH as f64 * (1f64/IDEAL_ASPECT_RATIO)) as u32;
 pub const ASPECT_RATIO:f64 = WINDOW_WIDTH as f64 / WINDOW_HEIGHT as f64;
 

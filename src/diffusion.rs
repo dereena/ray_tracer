@@ -1,6 +1,7 @@
 use glam::DVec3;
 use crate::{lerp, rand_0, random_unit_vector};
-use crate::structs::{Glass, HitInfo, Material, Ray};
+use crate::structs::rays::*;
+use crate::structs::materials::*;
 
 pub fn diffuse(ray:&mut Ray, hit_info:&HitInfo) {
     let lambertian_dir:DVec3 = lambertian_diffusion(hit_info);

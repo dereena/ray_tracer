@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-glam = "0.33.10"
+glam = "0.34.0"
 image = "0.25.10"
 rand = "0.10.3"
 rayon = "1.12.0"

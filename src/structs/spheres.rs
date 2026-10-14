@@ -1,8 +1,9 @@
 use glam::DVec3;
-use crate::bvh::BoundingBox;
+use crate::structs::bvh::BoundingBox;
 use crate::lerp;
-use crate::structs::{HitInfo, Material, Ray};
-use crate::interval::Interval;
+use crate::structs::rays::*;
+use crate::structs::materials::*;
+use crate::structs::interval::Interval;
 
 #[derive(Clone)]
 pub struct Sphere{

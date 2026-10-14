@@ -1,8 +1,8 @@
 use std::ops::{Add, AddAssign};
 use glam::DVec3;
 use rand::random_range;
-use crate::structs::{HitInfo, Hittable, Ray};
-use crate::interval::Interval;
+use crate::structs::rays::{HitInfo, Hittable, Ray};
+use crate::structs::interval::Interval;
 
 
 pub enum Bvh {
@@ -66,6 +66,8 @@ impl Bvh {
     }
 }
 
+
+
 #[derive(Copy, Clone)]
 pub struct BoundingBox {
     pub interval_x:Interval,
@@ -115,11 +117,14 @@ impl BoundingBox {
         let interval_x:Interval = if a.x < b.x {Interval {min:a.x,max:b.x}} else {Interval {min:b.x,max:a.x}};
         let interval_y:Interval = if a.y < b.y {Interval {min:a.y,max:b.y}} else {Interval {min:b.y,max:a.y}};
         let interval_z:Interval = if a.z < b.z {Interval {min:a.z,max:b.z}} else {Interval {min:b.z,max:a.z}};
-        BoundingBox {
+        let mut bounding_box = BoundingBox {
             interval_x,
             interval_y,
             interval_z
-        }
+        };
+        bounding_box.pad_to_min();
+        bounding_box
+
     }
     pub fn join_boxes(box_1:BoundingBox,box_2:BoundingBox) -> BoundingBox {
         let interval_x:Interval = Interval::join(box_1.interval_x,box_2.interval_x);
@@ -137,6 +142,12 @@ impl BoundingBox {
             2 => self.interval_y,
             _ => self.interval_z,
         }
+    }
+    pub fn pad_to_min(&mut self) {
+        let min_width:f64 = 0.0001;
+        if self.interval_x.size() < min_width {self.interval_x.expand(min_width)};
+        if self.interval_y.size() < min_width {self.interval_y.expand(min_width)};
+        if self.interval_z.size() < min_width {self.interval_z.expand(min_width)};
     }
     pub fn hit(&self,ray:&Ray,ray_t:&mut Interval) -> bool {
         let ray_origin:DVec3 = ray.origin;
